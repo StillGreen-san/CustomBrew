@@ -1,0 +1,6 @@
+name: CustomBrew
+version: '${version}'
+
+main: moe.sgs.customBrew.CustomBrew
+api-version: '1.21.11'
+load: POSTWORLD
