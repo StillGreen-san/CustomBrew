@@ -1,17 +1,13 @@
 package moe.sgs.customBrew
 
 import io.papermc.paper.potion.PotionMix
-import io.papermc.paper.util.Tick
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.translation.Translatable
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.plugin.java.JavaPlugin
@@ -19,7 +15,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionType
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.minutes
 
 class CustomBrew : JavaPlugin() {
 
@@ -37,7 +33,7 @@ class CustomBrew : JavaPlugin() {
                 )
             )
             (it as PotionMeta).addCustomEffect(
-                PotionEffect(PotionEffectType.HASTE, 3 * 60 * 20, 0),
+                PotionEffect(PotionEffectType.HASTE, 3.minutes.inWholeTicks.toInt(), 0),
                 true
             )
         }
@@ -50,7 +46,7 @@ class CustomBrew : JavaPlugin() {
                 potionHasteKey,
                 potionOfHaste,
                 RecipeChoice.ExactChoice(mundanePotion),
-                RecipeChoice.itemType(ItemType.HONEYCOMB_BLOCK),
+                RecipeChoice.ExactChoice(ItemStack(Material.HONEYCOMB_BLOCK)),
             )
         )
     }
@@ -59,3 +55,9 @@ class CustomBrew : JavaPlugin() {
         Bukkit.getPotionBrewer().removePotionMix(potionHasteKey)
     }
 }
+
+private val Duration.inWholeTicks: Long
+    get() = this.inWholeMilliseconds / MS_PER_TICK
+
+private const val MS_PER_TICK = 50
+
