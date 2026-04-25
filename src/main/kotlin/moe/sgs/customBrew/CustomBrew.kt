@@ -24,7 +24,7 @@ class CustomBrew : JavaPlugin() {
     private val durationLong = 8.minutes.inWholeTicks.toInt()
     private val durationStrong = 1.5.minutes.inWholeTicks.toInt()
 
-    private val mixKeys = ArrayList<NamespacedKey>(9)
+    private val mixKeys = ArrayList<NamespacedKey>(15)
 
     override fun onEnable() {
         val thickPotion = ItemStack(Material.POTION)
@@ -32,8 +32,31 @@ class CustomBrew : JavaPlugin() {
             (it as PotionMeta).basePotionType = PotionType.THICK
         }
         val hastePotion = addMix(thickPotion, durationBase, 0, Material.HONEYCOMB_BLOCK, "potion")
-        /*val longHastePotion =*/ addMix(hastePotion, durationLong, 0, Material.REDSTONE)
-        /*val strongHastePotion =*/ addMix(hastePotion, durationStrong, 1, Material.GLOWSTONE_DUST)
+        val longHastePotion = addMix(hastePotion, durationLong, 0, Material.REDSTONE)
+        val strongHastePotion = addMix(hastePotion, durationStrong, 1, Material.GLOWSTONE_DUST)
+
+        val splashPotion = ItemStack(Material.SPLASH_POTION)
+        splashPotion.editMeta {
+            (it as PotionMeta).basePotionType = PotionType.THICK
+        }
+        val hasteSplashPotion = addMix(splashPotion, durationBase, 0, Material.HONEYCOMB_BLOCK, "splash_potion")
+        val longHasteSplashPotion = addMix(hasteSplashPotion, durationLong, 0, Material.REDSTONE)
+        val strongHasteSplashPotion = addMix(hasteSplashPotion, durationStrong, 1, Material.GLOWSTONE_DUST)
+
+        val lingerPotion = ItemStack(Material.LINGERING_POTION)
+        lingerPotion.editMeta {
+            (it as PotionMeta).basePotionType = PotionType.THICK
+        }
+        val hasteLingerPotion = addMix(lingerPotion, durationBase, 0, Material.HONEYCOMB_BLOCK, "lingering_potion")
+        val longHasteLingerPotion = addMix(hasteLingerPotion, durationLong, 0, Material.REDSTONE)
+        val strongHasteLingerPotion = addMix(hasteLingerPotion, durationStrong, 1, Material.GLOWSTONE_DUST)
+
+        addMix(hastePotion, Material.GUNPOWDER, hasteSplashPotion)
+        addMix(longHastePotion, Material.GUNPOWDER, longHasteSplashPotion)
+        addMix(strongHastePotion, Material.GUNPOWDER, strongHasteSplashPotion)
+        addMix(hasteSplashPotion, Material.DRAGON_BREATH, hasteLingerPotion)
+        addMix(longHasteSplashPotion, Material.DRAGON_BREATH, longHasteLingerPotion)
+        addMix(strongHasteSplashPotion, Material.DRAGON_BREATH, strongHasteLingerPotion)
     }
 
     override fun onDisable() {
@@ -62,6 +85,15 @@ class CustomBrew : JavaPlugin() {
                 true
             )
         }
+        addMix(basePotion, ingredient, resultPotion)
+        return resultPotion
+    }
+
+    private fun addMix(
+        basePotion: ItemStack,
+        ingredient: Material,
+        resultPotion: ItemStack
+    ) {
         val mixKey = NamespacedKey(this, Random.nextLong().toHexString())
         Bukkit.getPotionBrewer().addPotionMix(
             PotionMix(
@@ -72,7 +104,6 @@ class CustomBrew : JavaPlugin() {
             )
         )
         mixKeys.add(mixKey)
-        return resultPotion
     }
 }
 
