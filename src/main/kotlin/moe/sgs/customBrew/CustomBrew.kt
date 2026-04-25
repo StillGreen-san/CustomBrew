@@ -19,11 +19,13 @@ import kotlin.time.Duration.Companion.minutes
 
 class CustomBrew : JavaPlugin() {
 
-    private val potionHasteKey = NamespacedKey(this, "potion_of_haste")
+    private val keyHaste = NamespacedKey(this, "potion_of_haste")
+    private val keyLongHaste = NamespacedKey(this, "potion_of_long_haste")
+    private val keyStrongHaste = NamespacedKey(this, "potion_of_strong_haste")
 
     override fun onEnable() {
-        val potionOfHaste = ItemStack(Material.POTION)
-        potionOfHaste.editMeta {
+        val hastePotion = ItemStack(Material.POTION)
+        hastePotion.editMeta {
             it.customName(
                 Component.translatable(
                     "potion.withAmplifier",
@@ -37,22 +39,54 @@ class CustomBrew : JavaPlugin() {
                 true
             )
         }
-        val mundanePotion = ItemStack(Material.POTION)
-        mundanePotion.editMeta {
-            (it as PotionMeta).basePotionType = PotionType.MUNDANE
+        val thickPotion = ItemStack(Material.POTION)
+        thickPotion.editMeta {
+            (it as PotionMeta).basePotionType = PotionType.THICK
         }
         Bukkit.getPotionBrewer().addPotionMix(
             PotionMix(
-                potionHasteKey,
-                potionOfHaste,
-                RecipeChoice.ExactChoice(mundanePotion),
+                keyHaste,
+                hastePotion,
+                RecipeChoice.ExactChoice(thickPotion),
                 RecipeChoice.ExactChoice(ItemStack(Material.HONEYCOMB_BLOCK)),
+            )
+        )
+        val longHastePotion = hastePotion.clone()
+        longHastePotion.editMeta {
+            (it as PotionMeta).addCustomEffect(
+                PotionEffect(PotionEffectType.HASTE, 8.minutes.inWholeTicks.toInt(), 0),
+                true
+            )
+        }
+        Bukkit.getPotionBrewer().addPotionMix(
+            PotionMix(
+                keyLongHaste,
+                longHastePotion,
+                RecipeChoice.ExactChoice(hastePotion),
+                RecipeChoice.ExactChoice(ItemStack(Material.REDSTONE)),
+            )
+        )
+        val strongHastePotion = hastePotion.clone()
+        strongHastePotion.editMeta {
+            (it as PotionMeta).addCustomEffect(
+                PotionEffect(PotionEffectType.HASTE, 1.5.minutes.inWholeTicks.toInt(), 1),
+                true
+            )
+        }
+        Bukkit.getPotionBrewer().addPotionMix(
+            PotionMix(
+                keyStrongHaste,
+                strongHastePotion,
+                RecipeChoice.ExactChoice(hastePotion),
+                RecipeChoice.ExactChoice(ItemStack(Material.GLOWSTONE_DUST)),
             )
         )
     }
 
     override fun onDisable() {
-        Bukkit.getPotionBrewer().removePotionMix(potionHasteKey)
+        Bukkit.getPotionBrewer().removePotionMix(keyHaste)
+        Bukkit.getPotionBrewer().removePotionMix(keyLongHaste)
+        Bukkit.getPotionBrewer().removePotionMix(keyStrongHaste)
     }
 }
 
@@ -60,4 +94,3 @@ private val Duration.inWholeTicks: Long
     get() = this.inWholeMilliseconds / MS_PER_TICK
 
 private const val MS_PER_TICK = 50
-
